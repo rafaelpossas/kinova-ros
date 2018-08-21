@@ -12,12 +12,12 @@
       <uri>model://sun</uri>
     </include>
 
-    <include>
+<!--     <include>
       <uri>model://kinect</uri>
       <pose>0 0.85 2 0 1 0</pose>
       <static>true</static>
     </include>
-
+ -->
     <!-- Focus camera on tall pendulum -->
     <gui fullscreen='0'>
       <camera name='user_camera'>

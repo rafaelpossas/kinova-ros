@@ -11,6 +11,23 @@
   <arg name="use_trajectory_controller" default="true"/>
   <arg name="is7dof" default="false"/>
 
+  <arg name="KINECT_XYZ" value="0.055 0.938 1.458"/>
+  <arg name="KINECT_RPY" value="-0.103 0.994 -0.147"/>
+  <arg name="KINECT_QUAT" value="-0.010 0.478 -0.040 0.877"/>
+
+
+  <node pkg="aruco_ros" type="single"  name="aruco_single">
+      <remap from="/camera_info"       to="/kinect/rgb/camera_info" />
+      <remap from="/image"             to="/kinect/rgb/image_raw" />
+      <param name="image_is_rectified" value="True"/>
+      <param name="marker_size"        value="0.045"/>
+      <param name="marker_id"          value="582"/>
+      <param name="reference_frame"    value="/world"/>   <!-- frame in which the marker pose will be expressed -->
+      <param name="camera_frame"       value="kinect_rgb_optical_frame"/>
+      <param name="marker_frame"       value="aruco_frame" />
+      <param name="corner_refinement"  value="SUBPIX" />
+  </node>
+
   <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find kinova_gazebo)/worlds/jaco.world"/>
@@ -29,9 +46,21 @@
 <node pkg="tf" type="static_transform_publisher" name="camera1_broadcaster" args="0 0.85 2 0 1 0 camera_link root 100" /> -->
 
   <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
-  <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+  <node name="arm_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
     args="-urdf -model $(arg kinova_robotName) -param robot_description"/>
+  
+  <!-- Spawn gazebo model / sensor -->
+  <param name="kinect_model"
+    command="$(find xacro)/xacro.py '$(find kinova_gazebo)/models/kinect.urdf.xacro'
+    xyz:='$(arg KINECT_XYZ)'
+    rpy:='$(arg KINECT_RPY)'" />
 
+  <node name="camera_spawner"
+    pkg="gazebo_ros"
+    type="spawn_model"
+    respawn="false" output="screen"
+    args="-b -urdf -model kinect -param kinect_model"/>
+  
   <!-- ros_control launch file -->
   <include file="$(find kinova_control)/launch/kinova_control.launch">
     <arg name="kinova_robotName" value="$(arg kinova_robotName)"/>
@@ -39,6 +68,7 @@
     <arg name="use_trajectory_controller" value="$(arg use_trajectory_controller)"/>
     <arg name="is7dof" value="$(arg is7dof)"/>
   </include>
+
 
   <!-- rqt launch file -->
   <!--  

@@ -21,37 +21,14 @@
   <xacro:include filename="$(find kinova_description)/urdf/objects/table_properties.xacro" />
   <xacro:include filename="$(find kinova_description)/urdf/objects/arm_stand.xacro" />
 
-  <link name="root">
-    <visual>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <geometry>
-        <box size = "0.01 0.01 0.01"/>
-      </geometry>
-    <!--<material name="Black" /> -->
-    </visual>
-
-    <collision>
-      <origin xyz="0 0 0" rpy="0 0 0" />
-      <geometry>
-        <box size = "0.01 0.01 0.01"/> 
-      </geometry>
-    </collision>
-  </link>
-
-    <!-- for gazebo -->
+  <!-- for gazebo -->
   <link name="world"/>
-
-  <joint name="connect_root_and_world" type="fixed">
-    <child link="root" />
-    <parent link="world" />
-    <origin xyz="0 0 0" rpy="0 0 0" />
-  </joint>
 
   <xacro:include filename="$(find kinova_description)/urdf/objects/table.xacro" />
 
   <joint name="table_to_arm" type="fixed">
     <origin xyz="1 1 0.3" rpy="0 0 0" />
-    <parent link="root"/>
+    <parent link="world"/>
     <child link="table_base"/>
   </joint>
 

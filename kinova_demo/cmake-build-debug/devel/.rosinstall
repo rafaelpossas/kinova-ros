@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/rafaelpossas/dev/catkin_ws/src/kinova-ros/kinova_demo/cmake-build-debug/devel/setup.sh
