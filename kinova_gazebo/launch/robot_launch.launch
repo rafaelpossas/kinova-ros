@@ -50,7 +50,7 @@
     args="-urdf -model $(arg kinova_robotName) -param robot_description"/>
   
   <!-- Spawn gazebo model / sensor -->
-  <param name="kinect_model"
+<!--   <param name="kinect_model"
     command="$(find xacro)/xacro.py '$(find kinova_gazebo)/models/kinect.urdf.xacro'
     xyz:='$(arg KINECT_XYZ)'
     rpy:='$(arg KINECT_RPY)'" />
@@ -59,7 +59,7 @@
     pkg="gazebo_ros"
     type="spawn_model"
     respawn="false" output="screen"
-    args="-b -urdf -model kinect -param kinect_model"/>
+    args="-b -urdf -model kinect -param kinect_model"/> -->
   
   <!-- ros_control launch file -->
   <include file="$(find kinova_control)/launch/kinova_control.launch">
