@@ -1,6 +1,7 @@
 import rospy
 import rospkg
 import sys
+from geometry_msgs.msg import PoseStamped, Pose
 from gazebo_msgs.srv import (
     SpawnModel,
     DeleteModel,
@@ -55,6 +56,8 @@ class KinovaUtilities(object):
         print robot.get_current_state()
         print ""
 
+        aruco_pose = rospy.wait_for_message('/aruco_single/pose', PoseStamped)
+        rospy.loginfo("Got: " + str(aruco_pose))
     ## END_SUB_TUTORIAL
 
     def open_gripper(self):

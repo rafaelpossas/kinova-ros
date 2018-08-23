@@ -15,19 +15,6 @@
   <arg name="KINECT_RPY" value="-0.103 0.994 -0.147"/>
   <arg name="KINECT_QUAT" value="-0.010 0.478 -0.040 0.877"/>
 
-
-  <node pkg="aruco_ros" type="single"  name="aruco_single">
-      <remap from="/camera_info"       to="/kinect/rgb/camera_info" />
-      <remap from="/image"             to="/kinect/rgb/image_raw" />
-      <param name="image_is_rectified" value="True"/>
-      <param name="marker_size"        value="0.045"/>
-      <param name="marker_id"          value="582"/>
-      <param name="reference_frame"    value="/world"/>   <!-- frame in which the marker pose will be expressed -->
-      <param name="camera_frame"       value="kinect_rgb_optical_frame"/>
-      <param name="marker_frame"       value="aruco_frame" />
-      <param name="corner_refinement"  value="SUBPIX" />
-  </node>
-
   <!-- We resume the logic in empty_world.launch, changing only the name of the world to be launched -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="world_name" value="$(find kinova_gazebo)/worlds/jaco.world"/>

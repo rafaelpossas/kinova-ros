@@ -1,0 +1,17 @@
+<launch>
+
+  <node pkg="aruco_ros" type="single"  name="aruco_single">
+      <remap from="/camera_info"       to="/kinect/hd/camera_info" />
+      <remap from="/image"             to="/kinect/hd/image_color_rect" />
+      <param name="image_is_rectified" value="True"/>
+      <param name="marker_size"        value="0.045"/>
+      <param name="marker_id"          value="582"/>
+      <param name="reference_frame"    value="/world"/>   <!-- frame in which the marker pose will be expressed -->
+      <param name="camera_frame"       value="kinect_rgb_optical_frame"/>
+      <param name="marker_frame"       value="aruco_frame" />
+      <param name="corner_refinement"  value="SUBPIX" />
+  </node>
+
+
+</launch>
+
