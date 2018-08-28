@@ -20,7 +20,7 @@
                          cam_py="0.015"
                          cam_pz="0.0"
                          cam_or="0.0"
-                         cam_op="${40*PI/180}"
+                         cam_op="${45*PI/180}"
                          cam_oy="0.0"/>
 
 </robot>

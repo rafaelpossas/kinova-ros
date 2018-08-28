@@ -8,6 +8,6 @@
     <xacro:property name="footMass" value="5.0"/>
 
     <xacro:property name="standRadius" value="0.03"/>
-    <xacro:property name="standHeight" value="1.3"/>
+    <xacro:property name="standHeight" value="1.1"/>
     <xacro:property name="standMass" value="0.5"/>
 </robot>

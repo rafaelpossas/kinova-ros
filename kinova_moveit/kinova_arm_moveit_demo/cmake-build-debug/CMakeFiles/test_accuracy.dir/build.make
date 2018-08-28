@@ -182,7 +182,7 @@ devel/lib/kinova_arm_moveit_demo/test_accuracy: /usr/lib/x86_64-linux-gnu/libboo
 devel/lib/kinova_arm_moveit_demo/test_accuracy: /usr/lib/x86_64-linux-gnu/libboost_thread.so
 devel/lib/kinova_arm_moveit_demo/test_accuracy: /usr/lib/x86_64-linux-gnu/libboost_chrono.so
 devel/lib/kinova_arm_moveit_demo/test_accuracy: /usr/lib/x86_64-linux-gnu/libboost_atomic.so
-devel/lib/kinova_arm_moveit_demo/test_accuracy: /home/rafaelpossas/dev/catkin_ws/devel/lib/libkinova_driver.so
+devel/lib/kinova_arm_moveit_demo/test_accuracy: /home/rafaelpossas/dev/catkin_ws/devel/.private/kinova_driver/lib/libkinova_driver.so
 devel/lib/kinova_arm_moveit_demo/test_accuracy: /opt/ros/kinetic/lib/libinteractive_markers.so
 devel/lib/kinova_arm_moveit_demo/test_accuracy: /opt/ros/kinetic/lib/libtf.so
 devel/lib/kinova_arm_moveit_demo/test_accuracy: /opt/ros/kinetic/lib/libtf2_ros.so
@@ -226,7 +226,7 @@ devel/lib/kinova_arm_moveit_demo/test_accuracy: /opt/ros/kinetic/lib/libgeometri
 devel/lib/kinova_arm_moveit_demo/test_accuracy: /opt/ros/kinetic/lib/liboctomap.so
 devel/lib/kinova_arm_moveit_demo/test_accuracy: /opt/ros/kinetic/lib/liboctomath.so
 devel/lib/kinova_arm_moveit_demo/test_accuracy: /opt/ros/kinetic/lib/librandom_numbers.so
-devel/lib/kinova_arm_moveit_demo/test_accuracy: /home/rafaelpossas/dev/catkin_ws/devel/lib/libkinova_driver.so
+devel/lib/kinova_arm_moveit_demo/test_accuracy: /home/rafaelpossas/dev/catkin_ws/devel/.private/kinova_driver/lib/libkinova_driver.so
 devel/lib/kinova_arm_moveit_demo/test_accuracy: /opt/ros/kinetic/lib/libinteractive_markers.so
 devel/lib/kinova_arm_moveit_demo/test_accuracy: /opt/ros/kinetic/lib/libtf.so
 devel/lib/kinova_arm_moveit_demo/test_accuracy: /opt/ros/kinetic/lib/libtf2_ros.so

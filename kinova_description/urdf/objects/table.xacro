@@ -104,7 +104,7 @@
 
 	<link name="tabletop_corner"/>
 	<joint name="set_tabletop_relto_corner" type="fixed">
-		<origin xyz="0.42 0.3 0" rpy="0 0 -0.76" /> <!-- exact 45 degrees of -0.785398163397458 does not match the real table -->
+		<origin xyz="0.42 0.0055 0" rpy="0 0 -1.56" /> <!-- exact 45 degrees of -0.785398163397458 does not match the real table -->
 		<parent link="tabletop_ontop"/>
 		<child link="tabletop_corner"/>
 	</joint>

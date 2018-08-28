@@ -20,8 +20,9 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "/opt/ros/kinetic/include"
   "/opt/ros/kinetic/share/xmlrpcpp/cmake/../../../include/xmlrpcpp"
   "/usr/include/eigen3"
-  "/home/rafaelpossas/dev/catkin_ws/devel/include"
+  "/home/rafaelpossas/dev/catkin_ws/devel/.private/kinova_driver/include"
   "/home/rafaelpossas/dev/catkin_ws/src/kinova-ros/kinova_driver/include"
+  "/home/rafaelpossas/dev/catkin_ws/devel/.private/kinova_msgs/include"
   )
 
 # Targets to which this target links.

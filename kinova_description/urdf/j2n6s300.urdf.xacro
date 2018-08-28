@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<robot name="jaco_robot" xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <link name="robot_root">
+  </link>
+
+  <xacro:include filename="$(find kinova_description)/urdf/j2n6s300.xacro" />
+  <xacro:j2n6s300 base_parent="robot_root"/>
+</robot>
