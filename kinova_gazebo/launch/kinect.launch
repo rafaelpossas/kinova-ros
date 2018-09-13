@@ -2,7 +2,7 @@
 
 <launch>
     <arg name="load_kinect_description" default="true"/>
-    <arg name="x" default="0.37"/>
+    <arg name="x" default="0.40"/>
     <arg name="y" default="0.83"/>
     <arg name="z" default="0.0"/>
 
@@ -20,7 +20,7 @@
     <!-- Publish a static transform between the world and the base of the kinect -->
     <node pkg="tf2_ros" type="static_transform_publisher"
           name="foot_to_world"
-          args="$(arg x) $(arg y) $(arg z) ${arg yaw} 0 0 world footprint"/>
+          args="$(arg x) $(arg y) $(arg z) $(arg yaw) $(arg pitch) $(arg roll) world footprint"/>
 
     <!-- Spawn the kinect sensor -->
     <node name="kinect_urdf_spawner" pkg="gazebo_ros" type="spawn_model"

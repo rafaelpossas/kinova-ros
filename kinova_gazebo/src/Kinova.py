@@ -63,53 +63,76 @@ class KinovaUtilities(object):
         print current_pose
         print ""
 
-        aruco_pose = rospy.wait_for_message('/aruco_single/pose', PoseStamped)
-        rospy.loginfo("Got: " + str(aruco_pose))
+        # aruco_pose = rospy.wait_for_message('/aruco_single/pose', PoseStamped)
+        # rospy.loginfo("Got: " + str(aruco_pose))
+        #self.return_home_position()
 
-        # self.listener = TransformListener()
-        # gripper_pos = geometry_msgs.msg.PoseStamped()
-        # gripper_pos.header.frame_id = "j2n6s300_end_effector"
-        # gripper_pos.pose.orientation.w = 1.0
-        # start_pos_manual = self.listener.transformPose("world", gripper_pos)
-        #
+        self.tf = TransformListener()
+
+        rate = rospy.Rate(10.0)
+
+
+        self.tf.waitForTransform("/world", "/tag_0", rospy.Time(), rospy.Duration(4.0))
+        now = rospy.Time(0)
+        (trans, rot) = self.tf.lookupTransform("/world", "/tag_0", now)
+
+        print trans
+
+
+        # tag_pos = geometry_msgs.msg.PoseStamped()
+        # tag_pos.header.frame_id = "tag_0"
+        # tag_pos.pose.orientation.w = 1.0
+        # start_pos_manual = self.listener.transformPose("world", tag_pos)
+        # #
         # rospy.loginfo("Pose via manual TF is: ")
         # rospy.loginfo(start_pos_manual)
-
-
-
-        pose_goal = geometry_msgs.msg.Pose()
-        pose_goal.orientation.w = -0.0823710076136
-        pose_goal.orientation.x = -0.643457482628
-        pose_goal.orientation.y = -0.20399941731
-        pose_goal.orientation.z = 0.733186008385
-
-        # pose_goal.orientation.w = 1
-
-        # pose_goal.position.x = aruco_pose.pose.position.x
-        # pose_goal.position.y = aruco_pose.pose.position.y
-        # pose_goal.position.z = aruco_pose.pose.position.z
-
-        # pose_goal.position.x = current_pose.pose.position.x
-        # pose_goal.position.y = current_pose.pose.position.y
-        # pose_goal.position.z = current_pose.pose.position.z
-
-        pose_goal.position.x = aruco_pose.pose.position.x - 0.07
-        pose_goal.position.y = aruco_pose.pose.position.y
-        pose_goal.position.z = aruco_pose.pose.position.z - 0.03
         #
+        # self.return_home_position()
+        # self.pre_grasp_y_to_origin(trans)
         #
-        self.arm_group.set_pose_target(pose_goal)
-        plan = self.arm_group.go(wait=True)
-        self.arm_group.stop()
-        self.arm_group.clear_pose_targets()
-        # self.move_gripper()
+        # self.return_home_position()
+        # self.pre_grasp_y_from_origin(trans)
+        #
+        # self.return_home_position()
+        # self.pre_grasp_x_to_origin(trans)
+
+        # self.return_home_position()
+
+        self.add_object("cube", trans)
+
+
+
+    def add_object(self, name, pos):
+        scene = moveit_commander.PlanningSceneInterface()
+        robot = moveit_commander.RobotCommander()
+        scene.remove_world_object(name)
+        p = PoseStamped()
+        p.header.frame_id = robot.get_planning_frame()
+
+        # p.pose.position.x = 0.917182
+        # p.pose.position.y = 0.858523
+        # p.pose.position.z = 0.755576
+
+        p.pose.position.x = pos[0]
+        p.pose.position.y = pos[1] - 0.03
+        p.pose.position.z = pos[2] - 0.02
+
+        scene.add_box(name, p, (0.05,0.05,0.05))
+
+        rospy.sleep(1)
+
     ## END_SUB_TUTORIAL
+    def return_home_position(self):
+        self.arm_group.set_named_target("Home")
+        plan = self.arm_group.plan()
+        self.arm_group.execute(plan)
 
-    def move_gripper(self):
+        rospy.sleep(1)
+    def open_gripper(self):
         joint_goal = self.gripper_group.get_current_joint_values()
-        joint_goal[0] = 0.71
-        joint_goal[1] = 0.71
-        joint_goal[2] = 0.71
+        joint_goal[0] = 0.2
+        joint_goal[1] = 0.2
+        joint_goal[2] = 0.2
 
         # The go command can be called with joint values, poses, or without any
         # parameters if you have already set the pose or joint target for the group
@@ -118,37 +141,95 @@ class KinovaUtilities(object):
 
         self.gripper_group.go(joint_goal, wait=True)
 
-    def open_gripper(self):
-        # We can get the joint values from the group and adjust some of the values:
-        # joint_goal = self.gripper_group.get_current_joint_values()
-        # joint_goal[0] = 0.2
-        # joint_goal[1] = 0.2
-        # joint_goal[2] = 0.2
+    # def open_gripper(self):
+    #     # We can get the joint values from the group and adjust some of the values:
+    #     # joint_goal = self.gripper_group.get_current_joint_values()
+    #     # joint_goal[0] = 0.2
+    #     # joint_goal[1] = 0.2
+    #     # joint_goal[2] = 0.2
+    #
+    #     # The go command can be called with joint values, poses, or without any
+    #     # parameters if you have already set the pose or joint target for the group
+    #     #self.gripper_group.go(joint_goal, wait=True)
+    #     self.gripper_group.set_named_target("Open")
+    #     plan = self.gripper_group.plan()
+    #     self.gripper_group.execute(plan)
+    #     rospy.sleep(1)
+    def pre_grasp_y_from_origin(self, trans):
+        self.close_gripper()
+
+        pose_goal = geometry_msgs.msg.Pose()
+
+        # Pushing from right pose
+        pose_goal.orientation.x = -0.0316320883026
+        pose_goal.orientation.y = 0.999261878539
+        pose_goal.orientation.z = 0.0204806930057
+        pose_goal.orientation.w = 0.00745991303797
+
+        pose_goal.position.x = trans[0] + 0.017
+        pose_goal.position.y = trans[1] - 0.08
+        pose_goal.position.z = trans[2] - 0.04
+
+        self.arm_group.set_pose_target(pose_goal)
+        self.arm_group.go(wait=True)
+        self.arm_group.stop()
+        self.arm_group.clear_pose_targets()
+
+    def pre_grasp_y_to_origin(self, trans):
+        self.close_gripper()
+
+        pose_goal = geometry_msgs.msg.Pose()
+
+        # Pushing from right pose
+        pose_goal.orientation.x = 0.999713383089
+        pose_goal.orientation.y = 0.0175424601738
+        pose_goal.orientation.z = -0.00329246532167
+        pose_goal.orientation.w = 0.0159553576136
+
+        pose_goal.position.x = trans[0] + 0.017
+        pose_goal.position.y = trans[1] + 0.07
+        pose_goal.position.z = trans[2] - 0.04
+
+        self.arm_group.set_pose_target(pose_goal)
+        self.arm_group.go(wait=True)
+        self.arm_group.stop()
+        self.arm_group.clear_pose_targets()
+
+    def pre_grasp_x_to_origin(self, trans):
+        self.close_gripper()
+
+        pose_goal = geometry_msgs.msg.Pose()
+
+        # Pushing from back pose
+        pose_goal.orientation.x = 0.74959557154
+        pose_goal.orientation.y = -0.659549814281
+        pose_goal.orientation.z = -0.0335475179298
+        pose_goal.orientation.w = 0.0444419357171
+
+        pose_goal.position.x = trans[0] + 0.09
+        pose_goal.position.y = trans[1]
+        pose_goal.position.z = trans[2] - 0.04
+
+        self.arm_group.set_pose_target(pose_goal)
+        self.arm_group.go(wait=True)
+        self.arm_group.stop()
+        self.arm_group.clear_pose_targets()
+
+
+    def close_gripper(self):
+        joint_goal = self.gripper_group.get_current_joint_values()
+        joint_goal[0] = 1.08
+        joint_goal[1] = 1.08
+        joint_goal[2] = 1.08
 
         # The go command can be called with joint values, poses, or without any
         # parameters if you have already set the pose or joint target for the group
         #self.gripper_group.go(joint_goal, wait=True)
-        self.gripper_group.set_named_target("Open")
-        plan = self.gripper_group.plan()
-        self.gripper_group.execute(plan)
-        rospy.sleep(1)
+        # self.gripper_group.set_named_target("Open")
 
-    def close_gripper(self):
-        #We can get the joint values from the group and adjust some of the values:
-        joint_goal = self.gripper_group.get_current_joint_values()
-        joint_goal[0] = 1.2
-        joint_goal[1] = 1.2
-        joint_goal[2] = 1.2
-
-        # The go command can be called with joint values, poses, or without any
-        # parameters if you have already set the pose or joint target for the group
         self.gripper_group.go(joint_goal, wait=True)
         self.gripper_group.stop()
-
-        # self.gripper_group.set_named_target("Close")
-        # plan = self.gripper_group.plan()
-        # self.gripper_group.execute(plan)
-        # rospy.sleep(1)
+        self.gripper_group.clear_pose_targets()
 
     def strip_leading_slash(self, s):
         return s[1:] if s.startswith("/") else s
