@@ -4,6 +4,11 @@ import sys
 from geometry_msgs.msg import PoseStamped, Pose
 import geometry_msgs.msg
 from tf import TransformListener
+from tf2_ros import TransformException
+import random
+from sensor_msgs.msg import JointState
+from std_msgs.msg import Header
+
 from gazebo_msgs.srv import (
     SpawnModel,
     DeleteModel,
@@ -19,6 +24,21 @@ import moveit_commander
 import moveit_msgs.msg
 
 class KinovaUtilities(object):
+
+    JOINT_1_MIN_MAX = (-3.14, 3.14)
+    JOINT_2_MIN_MAX = (0.82, 5.46)
+    JOINT_3_MIN_MAX = (0.33, 5.95)
+    JOINT_4_MIN_MAX = (-3.14, 3.14)
+    JOINT_5_MIN_MAX = (-3.14, 3.14)
+    JOINT_6_MIN_MAX = (-3.14, 3.14)
+
+    CUBE_GZ_NAME = "cube"
+
+    X_CUBE_MIN = 0.76
+    X_CUBE_MAX = 1.03
+
+    Y_CUBE_MIN = 0.55
+    Y_CUBE_MAX = 1.05
 
     def __init__(self):
         super(KinovaUtilities, self).__init__()
@@ -74,13 +94,26 @@ class KinovaUtilities(object):
         rate = rospy.Rate(10.0)
 
 
-        self.tf.waitForTransform("/world", "/tag_0", rospy.Time(), rospy.Duration(4))
-        now = rospy.Time(0)
-        (trans, rot) = self.tf.lookupTransform("/world", "/tag_0", now)
 
-        print trans
 
-        self.add_object("cube", trans,rot)
+        #print trans
+
+        # rand_x = random.uniform(self.X_CUBE_MIN, self.X_CUBE_MAX)
+        # rand_y = random.uniform(self.Y_CUBE_MIN, self.Y_CUBE_MAX)
+        #
+        # self.delete_gazebo_object(self.CUBE_GZ_NAME)
+        # self.spawn_gazebo_object(x=rand_x, y=rand_y, model_name=self.CUBE_GZ_NAME)
+        #
+        # try:
+        #     self.tf.waitForTransform("/world", "/tag_0", rospy.Time(), rospy.Duration(4))
+        #     now = rospy.Time(0)
+        #     (trans, rot) = self.tf.lookupTransform("/world", "/tag_0", now)
+        #     self.add_rviz_object(self.CUBE_GZ_NAME, trans, rot)
+        # except TransformException, e:
+        #     rospy.logerr("Could not find the TAG: {0}".format(e))
+
+
+        #self.add_object("cube", trans,rot)
 
         # tag_pos = geometry_msgs.msg.PoseStamped()
         # tag_pos.header.frame_id = "tag_0"
@@ -96,10 +129,14 @@ class KinovaUtilities(object):
         # self.return_home_position()
         # self.pre_grasp_face_2(trans)
         # # #
-        self.return_home_position()
-        self.pre_grasp_face_1(trans)
+        # self.return_home_position()
+        # self.pre_grasp_face_1(trans)
 
         # self.return_home_position()
+        try:
+            self.joint_planning()
+        except moveit_commander.MoveItCommanderException, e:
+            print(e)
 
     def wait_for_state_update(self, box_is_known=False, box_is_attached=False, timeout=4):
         # Copy class variables to local variables to make the web tutorials more clear.
@@ -143,7 +180,7 @@ class KinovaUtilities(object):
         return False
 
 
-    def add_object(self, name, pos, rot):
+    def add_rviz_object(self, name, pos, rot):
         timeout = 4
 
         self.scene.remove_world_object(name)
@@ -174,6 +211,20 @@ class KinovaUtilities(object):
         self.arm_group.execute(plan)
 
         rospy.sleep(1)
+
+    def joint_planning(self, joint_deltas=[]):
+        goal = self.arm_group.get_current_joint_values()
+
+        # joint_goal[0] = 4.8046
+        # joint_goal[1] = 2.9248
+        # joint_goal[2] = 1.0020
+        # joint_goal[3] = 4.2031
+        # joint_goal[4] = 1.4458
+        # joint_goal[5] = 1.3233
+
+        self.arm_group.go(goal, wait=True)
+        self.arm_group.stop()
+
     def open_gripper(self):
         joint_goal = self.gripper_group.get_current_joint_values()
         joint_goal[0] = 0.2
@@ -313,27 +364,43 @@ class KinovaUtilities(object):
     def strip_leading_slash(self, s):
         return s[1:] if s.startswith("/") else s
 
-    def spawn_object(self):
-        model_path = "/home/rafaelpossas/.gazebo/models/"
 
-        table_pose = Pose(position=Point(x=0.6, y=0.5, z=0.67))
-        table_reference_frame = "world"
 
-        with open(model_path + "coke_can/model.sdf", "r") as table_file:
-            table_xml = table_file.read().replace('\n', '')
+    # POSE: Y_MAX = 1.05 Y_MIN=0.55
+    #       X_MAX = 0.76 X_MIN=1.03
+    #       Z_MIN_MAX = 0.75
+    def spawn_gazebo_object(self,x, y, model_path="/home/rafaelpossas/.gazebo/models/",
+                     model_file_path="aruco_cube/aruco_cube.sdf",
+                     model_name="cube"):
+
+        model_pose = Pose(position=Point(x=x, y=y, z=0.75))
+        model_reference_name = "world"
+
+        with open(model_path + model_file_path, "r") as model_file:
+            model_xml = model_file.read().replace('\n', '')
 
         rospy.wait_for_service('/gazebo/spawn_sdf_model')
+
         try:
             spawn_sdf = rospy.ServiceProxy('/gazebo/spawn_sdf_model', SpawnModel)
-            resp_sdf = spawn_sdf("cafe_table", table_xml, "/", table_pose, table_reference_frame)
+            resp_sdf = spawn_sdf(model_name, model_xml, "/", model_pose, model_reference_name)
 
             
         except rospy.ServiceException, e:
             rospy.logerr("Spawn SDF service call failed: {0}".format(e))
-        return false
+            return False
+        return True
 
-    def delete_object(self):
-        return false
+    def delete_gazebo_object(self,name="cube"):
+        rospy.wait_for_service('/gazebo/delete_model')
+        try:
+            delete_sdf = rospy.ServiceProxy('/gazebo/delete_model', DeleteModel)
+            delete_sdf(name)
+        except rospy.ServiceException, e:
+            rospy.logerr("Delete SDF service call failed: {0}".format(e))
+            return False
+
+        return True
 
 
 if __name__ == '__main__':
