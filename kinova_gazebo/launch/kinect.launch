@@ -2,8 +2,8 @@
 
 <launch>
     <arg name="load_kinect_description" default="true"/>
-    <arg name="x" default="0.40"/>
-    <arg name="y" default="0.83"/>
+    <arg name="x" default="0.20"/>
+    <arg name="y" default="0.0"/>
     <arg name="z" default="0.0"/>
 
     <arg name="roll" default="0.0"/>

@@ -32,6 +32,10 @@ class KinovaUtilities(object):
     JOINT_5_MIN_MAX = (-3.14, 3.14)
     JOINT_6_MIN_MAX = (-3.14, 3.14)
 
+    JOINT_4_OFFSET = 6.28325902769
+    JOINT_5_OFFSET = -18.8241170548
+    JOINT_6_OFFSET = 18.8293733406
+
     CUBE_GZ_NAME = "cube"
 
     X_CUBE_MIN = 0.76
@@ -64,12 +68,12 @@ class KinovaUtilities(object):
         ## you should change this value to the name of your robot arm planning group.
         ## This interface can be used to plan and execute motions on the Panda:
 
-        self.arm_group_name = "arm"
+        self.arm_group_name = "Arm"
         self.arm_group = moveit_commander.MoveGroupCommander(self.arm_group_name)
         print "============ Printing arm joint values"
         #print self.arm_group.get_current_joint_values()
 
-        self.gripper_group_name = "gripper"
+        self.gripper_group_name = "All"
         self.gripper_group = moveit_commander.MoveGroupCommander(self.gripper_group_name)
         print "============ Printing gripper joint values"
         #print self.gripper_group.get_current_joint_values()
@@ -104,13 +108,13 @@ class KinovaUtilities(object):
         # self.delete_gazebo_object(self.CUBE_GZ_NAME)
         # self.spawn_gazebo_object(x=rand_x, y=rand_y, model_name=self.CUBE_GZ_NAME)
         #
-        # try:
-        #     self.tf.waitForTransform("/world", "/tag_0", rospy.Time(), rospy.Duration(4))
-        #     now = rospy.Time(0)
-        #     (trans, rot) = self.tf.lookupTransform("/world", "/tag_0", now)
-        #     self.add_rviz_object(self.CUBE_GZ_NAME, trans, rot)
-        # except TransformException, e:
-        #     rospy.logerr("Could not find the TAG: {0}".format(e))
+        try:
+            self.tf.waitForTransform("/world", "/tag_0", rospy.Time(), rospy.Duration(4))
+            now = rospy.Time(0)
+            (trans, rot) = self.tf.lookupTransform("/world", "/tag_0", now)
+            self.add_rviz_object(self.CUBE_GZ_NAME, trans, rot)
+        except TransformException, e:
+            rospy.logerr("Could not find the TAG: {0}".format(e))
 
 
         #self.add_object("cube", trans,rot)
@@ -124,7 +128,7 @@ class KinovaUtilities(object):
         # rospy.loginfo(start_pos_manual)
         #
         # self.return_home_position()
-        # self.pre_grasp_face_4(trans)
+        self.pre_grasp_face_4(trans)
 
         # self.return_home_position()
         # self.pre_grasp_face_2(trans)
@@ -221,9 +225,12 @@ class KinovaUtilities(object):
         # joint_goal[3] = 4.2031
         # joint_goal[4] = 1.4458
         # joint_goal[5] = 1.3233
+        goal[3] = 3.14
+        goal[4] = -3.14
+        goal[5] = 0
 
         self.arm_group.go(goal, wait=True)
-        self.arm_group.stop()
+        #self.arm_group.stop()
 
     def open_gripper(self):
         joint_goal = self.gripper_group.get_current_joint_values()
@@ -284,26 +291,26 @@ class KinovaUtilities(object):
         self.arm_group.clear_pose_targets()
 
     def pre_grasp_face_4(self, trans):
-        self.close_gripper()
+        #self.close_gripper()
 
         self.tf.waitForTransform("/world", "/tag_0", rospy.Time(0), rospy.Duration(4))
 
         cube_point = PointStamped()
         cube_point.header.frame_id = "tag_0"
         cube_point.header.stamp = rospy.Time(0)
-        cube_point.point.x = -0.02
-        cube_point.point.y = 0.07
-        cube_point.point.z = 0.0
+        cube_point.point.x = 0
+        cube_point.point.y = 0
+        cube_point.point.z = 0.2
 
         trans = self.tf.transformPoint("world", cube_point)
 
         pose_goal = geometry_msgs.msg.Pose()
 
         # Pushing from right pose
-        pose_goal.orientation.x = 0.999713383089
-        pose_goal.orientation.y = 0.0175424601738
-        pose_goal.orientation.z = -0.00329246532167
-        pose_goal.orientation.w = 0.0159553576136
+        pose_goal.orientation.x = 0.31907073
+        pose_goal.orientation.y = 0.6343005
+        pose_goal.orientation.z = 0.33179136
+        pose_goal.orientation.w = 0.62110477
 
         pose_goal.position.x = trans.point.x
         pose_goal.position.y = trans.point.y
